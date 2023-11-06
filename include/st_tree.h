@@ -24,7 +24,7 @@ limitations under the License.
 
 #include <string>
 #include <exception>
-
+#include <map>
 
 namespace st_tree {
 
@@ -173,6 +173,24 @@ struct tree {
         return *this;
     }
 
+    const node_type* get(size_type id) const {
+        if (_node_cache.contains(id))
+        {
+            return _node_cache[id];
+        }
+
+        for (const auto& n : *this)
+        {
+            _node_cache[n.id()] = &n;
+
+            if (n.id() == id)
+            {
+                return &n;
+            }
+        }
+
+        return nullptr;
+    }
 
     bool empty() const { return _root == NULL; }
     size_type size() const { return (empty()) ? 0 : root().subtree_size(); }
@@ -289,10 +307,13 @@ struct tree {
     node_type* _new_node() {
         node_type* n = _node_allocator.allocate(1);
         std::allocator_traits<node_allocator_type>::construct(_node_allocator, n, _node_init_val);
+        n->_id = ++_id;
+        _node_cache[_id] = n;
         return n;
     }
 
     void _delete_node(node_type* n) {
+        _node_cache.erase(n->_id);
         std::allocator_traits<node_allocator_type>::destroy(_node_allocator, n);
         std::allocator_traits<node_allocator_type>::deallocate(_node_allocator, n, 1);
     }
@@ -304,8 +325,14 @@ struct tree {
         n->_parent = NULL;
         n->_tree = this;
     }
+
+    mutable std::map<size_type, const node_type*>  _node_cache{};
+
+    static size_type _id;
 };
 
+template <typename Data, typename CSModel, typename Alloc>
+tree<Data, CSModel, Alloc>::size_type tree<Data, CSModel, Alloc>::_id{ 0 };
 
 template <typename Data, typename CSModel, typename Alloc>
 const typename tree<Data, CSModel, Alloc>::node_type tree<Data, CSModel, Alloc>::_node_init_val;
