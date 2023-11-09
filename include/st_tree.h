@@ -144,8 +144,6 @@ struct tree {
     typedef typename node_type::df_pre_iterator df_pre_iterator;
     typedef typename node_type::const_df_pre_iterator const_df_pre_iterator;
 
-    using path = std::map<size_type, size_type>;
-
     tree() : _root(NULL), _node_allocator() {}
     virtual ~tree() { clear(); }
 
@@ -191,23 +189,6 @@ struct tree {
         }
 
         return nullptr;
-    }
-
-    const node_type* navigate(const node_type* node, int step, path p = path{})
-    {
-        if (!node || (step == 0)) return node;
-
-        if (step < 0) return navigate(&node->parent(), step + 1);
-
-        const node_type* node_next{
-            node->empty()
-                ? nullptr
-                : p.contains(node->id())
-                ? get(p[node->id()])
-                : &node[0]
-        };
-
-        return navigate(node_next, step - 1, p);
     }
 
     bool empty() const { return _root == NULL; }
