@@ -389,8 +389,8 @@ struct node_raw: public node_base<Tree, node_raw<Tree, Data>, vector<node_raw<Tr
         node_type* ra = qa;
         node_type* rb = qb;
 
-        node_type* pa; if (!a.is_root()) pa = a._parent;
-        node_type* pb; if (!b.is_root()) pb = b._parent;
+        node_type* pa{ a.is_root() ? nullptr : a._parent };
+        node_type* pb{ b.is_root() ? nullptr : b._parent };
 
         if (ira) ta->_prune(ra);   else pa->_prune(ra);
         if (irb) tb->_prune(rb);   else pb->_prune(rb);
