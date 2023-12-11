@@ -172,6 +172,25 @@ struct tree {
         return *this;
     }
 
+    node_type* get(size_type id) {
+        if (_node_cache.contains(id))
+        {
+            return const_cast<node_type*>(_node_cache[id]);
+        }
+
+        for (auto& n : *this)
+        {
+            _node_cache[n.id()] = &n;
+
+            if (n.id() == id)
+            {
+                return &n;
+            }
+        }
+
+        return nullptr;
+    }
+
     const node_type* get(size_type id) const {
         if (_node_cache.contains(id))
         {

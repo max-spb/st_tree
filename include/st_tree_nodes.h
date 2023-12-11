@@ -78,7 +78,7 @@ struct node_base {
     const_df_pre_iterator df_pre_begin() const { return const_df_pre_iterator(static_cast<const node_type*>(this)); }
     const_df_pre_iterator df_pre_end() const { return const_df_pre_iterator(); }
 
-    node_base() : _tree(NULL), _size(1), _parent(NULL), _data(), _children(), _depth(), _id() {}
+    node_base() : _tree(NULL), _size(1), _parent(NULL), _data(), _children(), _id(), _depth() {}
     virtual ~node_base() {
         // Saves work, and also prevents exception attempting to call tree() on default-constructed nodes
         if (_children.empty() || _default_constructed()) return;
