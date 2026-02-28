@@ -18,6 +18,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ******/
 
+#include <atomic>
+
 #if !defined(__st_tree_nodes_h__)
 #define __st_tree_nodes_h__ 1
 
@@ -78,7 +80,7 @@ struct node_base {
     const_df_pre_iterator df_pre_begin() const { return const_df_pre_iterator(static_cast<const node_type*>(this)); }
     const_df_pre_iterator df_pre_end() const { return const_df_pre_iterator(); }
 
-    node_base() : _tree(NULL), _size(1), _parent(NULL), _data(), _children(), _depth() {}
+    node_base() : _tree(NULL), _size(1), _id(ID.fetch_add(1)), _parent(NULL), _data(), _children(), _depth() {}
     virtual ~node_base() {
         // Saves work, and also prevents exception attempting to call tree() on default-constructed nodes
         if (_children.empty() || _default_constructed()) return;
@@ -114,6 +116,7 @@ struct node_base {
         return *(q->_tree);
     }
 
+    size_type id() const { return _id; }
     size_type depth() const { return _depth.max(); }
     size_type subtree_size() const { return _size; }
 
@@ -198,8 +201,10 @@ struct node_base {
     friend struct d1st_pre_iterator<node_type, const node_type, allocator_type>;
 
     protected:
+    static inline std::atomic<size_type> ID = 1;
     tree_type* _tree;
     size_type _size;
+    size_type _id;
     node_type* _parent;
     data_type _data;
     cs_type _children;
